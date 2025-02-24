@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NY-Style Pizza Dough Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    h2 { color: #333; }
+    label { display: block; margin: 5px 0; font-size: 16px; }
+    input { width: 80px; padding: 3px; margin-left: 10px; }
+    button { margin-top: 15px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    #result { margin-top: 20px; font-size: 16px; line-height: 1.5; background: white; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h2>NY-Style Pizza Dough Calculator</h2>
+  <label>Target Weight (g, post-residue): <input type="number" id="targetWeight" value="340"></label>
+  <label>Bowl Residue (%): <input type="number" id="residue" value="4" step="0.1"></label>
+  <label>Hydration (%): <input type="number" id="hydration" value="63" step="0.1"></label>
+  <label>Biga Flour (% of total): <input type="number" id="bigaFlour" value="40" step="0.1"></label>
+  <label>Biga Hydration (%): <input type="number" id="bigaHydration" value="63" step="0.1"></label>
+  <label>Total Yeast (% of flour): <input type="number" id="totalYeast" value="0.4" step="0.01"></label>
+  <label>Biga Yeast (% of total yeast): <input type="number" id="bigaYeast" value="25" step="0.1"></label>
+  <label>Salt (%): <input type="number" id="salt" value="2.5" step="0.1"></label>
+  <label>Sugar (%): <input type="number" id="sugar" value="1.5" step="0.1"></label>
+  <label>Olive Oil (%): <input type="number" id="oil" value="2" step="0.1"></label>
+  <label>Diastatic Malt (%): <input type="number" id="malt" value="0.5" step="0.1"></label>
+  <button onclick="calculate()">Calculate</button>
+  <div id="result"></div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker Registered'))
+        .catch(err => console.log('Service Worker Failed', err));
+    }
+
+    function calculate() {
+      let w = parseFloat(document.getElementById("targetWeight").value);
+      let r = parseFloat(document.getElementById("residue").value) / 100;
+      let h = parseFloat(document.getElementById("hydration").value) / 100;
+      let bf = parseFloat(document.getElementById("bigaFlour").value) / 100;
+      let bh = parseFloat(document.getElementById("bigaHydration").value) / 100;
+      let y = parseFloat(document.getElementById("totalYeast").value) / 100;
+      let by = parseFloat(document.getElementById("bigaYeast").value) / 100;
+      let s = parseFloat(document.getElementById("salt").value) / 100;
+      let su = parseFloat(document.getElementById("sugar").value) / 100;
+      let o = parseFloat(document.getElementById("oil").value) / 100;
+      let m = parseFloat(document.getElementById("malt").value) / 100;
+
+      let preW = w / (1 - r);
+      let totalP = 1 + h + s + su + o + m + y;
+      let flour = preW / totalP;
+
+      let water = flour * h;
+      let yeast = flour * y;
+      let bigaF = flour * bf;
+      if (Math.abs(bigaF - 80) < 5) bigaF = 80;
+      let bigaW = bigaF * bh;
+      let bigaY = yeast * by;
+      let finalF = flour - bigaF;
+      let finalW = water - bigaW;
+      let finalY = yeast - bigaY;
+      let saltW = flour * s;
+      let sugarW = flour * su;
+      let oilW = flour * o;
+      let maltW = flour * m;
+
+      let result = `
+        <b>Pre-Residue Total:</b> ${preW.toFixed(1)} g<br>
+        <b>Total Flour:</b> ${flour.toFixed(1)} g<br>
+        <b>Total Water:</b> ${water.toFixed(1)} g<br>
+        <b>Total Yeast:</b> ${yeast.toFixed(2)} g<br>
+        <b>Biga:</b><br>
+        - Flour: ${bigaF.toFixed(1)} g<br>
+        - Water: ${bigaW.toFixed(1)} g<br>
+        - Yeast: ${bigaY.toFixed(2)} g<br>
+        - Total: ${(bigaF + bigaW + bigaY).toFixed(1)} g<br>
+        <b>Final Dough:</b><br>
+        - Flour: ${finalF.toFixed(1)} g<br>
+        - Water: ${finalW.toFixed(1)} g<br>
+        - Yeast: ${finalY.toFixed(2)} g<br>
+        - Salt: ${saltW.toFixed(1)} g<br>
+        - Sugar: ${sugarW.toFixed(1)} g<br>
+        - Olive Oil: ${oilW.toFixed(1)} g<br>
+        - Diastatic Malt: ${maltW.toFixed(1)} g<br>
+        - Total (with biga): ${preW.toFixed(1)} g<br>
+        <b>Single Ball:</b> ${w.toFixed(1)} g (post-${(r*100).toFixed(1)}% residue)
+      `;
+      document.getElementById("result").innerHTML = result;
+    }
+  </script>
+</body>
+</html>
