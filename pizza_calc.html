@@ -10,10 +10,11 @@
     body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
     h2 { color: #333; }
     label { display: block; margin: 5px 0; font-size: 16px; }
-    input { width: 80px; padding: 3px; margin-left: 10px; }
-    button { margin-top: 15px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    input, select, textarea { width: 120px; padding: 3px; margin-left: 10px; }
+    button { margin: 10px 5px 0 0; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #45a049; }
     #result { margin-top: 20px; font-size: 16px; line-height: 1.5; background: white; padding: 10px; border-radius: 5px; }
+    #notes { width: 200px; height: 80px; vertical-align: top; }
   </style>
 </head>
 <body>
@@ -30,7 +31,13 @@
   <label>Sugar (%): <input type="number" id="sugar" value="1.5" step="0.1"></label>
   <label>Olive Oil (%): <input type="number" id="oil" value="2" step="0.1"></label>
   <label>Diastatic Malt (%): <input type="number" id="malt" value="0.5" step="0.1"></label>
+  <label>Saved Recipes: <select id="recipeSelect" onchange="loadRecipe()">
+    <option value="">-- Select Recipe --</option>
+  </select></label>
+  <label>Recipe Name: <input type="text" id="recipeName" placeholder="Enter name"></label>
+  <label>Notes: <textarea id="notes" placeholder="How did it turn out?"></textarea></label>
   <button onclick="calculate()">Calculate</button>
+  <button onclick="saveRecipe()">Save Recipe</button>
   <div id="result"></div>
 
   <script>
@@ -39,6 +46,18 @@
         .then(() => console.log('Service Worker Registered'))
         .catch(err => console.log('Service Worker Failed', err));
     }
+
+    // Load saved recipes on start
+    window.onload = function() {
+      let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
+      let select = document.getElementById('recipeSelect');
+      for (let name in recipes) {
+        let option = document.createElement('option');
+        option.value = name;
+        option.text = name;
+        select.appendChild(option);
+      }
+    };
 
     function calculate() {
       let n = parseFloat(document.getElementById("numPies").value);
@@ -54,7 +73,7 @@
       let o = parseFloat(document.getElementById("oil").value) / 100;
       let m = parseFloat(document.getElementById("malt").value) / 100;
 
-      let totalW = w * n; // Total weight for all pies
+      let totalW = w * n;
       let preW = totalW / (1 - r);
       let totalP = 1 + h + s + su + o + m + y;
       let flour = preW / totalP;
@@ -62,7 +81,7 @@
       let water = flour * h;
       let yeast = flour * y;
       let bigaF = flour * bf;
-      if (n === 1 && Math.abs(bigaF - 80) < 5) bigaF = 80; // Snap to 80 g for 1 pie
+      if (n === 1 && Math.abs(bigaF - 80) < 5) bigaF = 80;
       let bigaW = bigaF * bh;
       let bigaY = yeast * by;
       let finalF = flour - bigaF;
@@ -95,6 +114,64 @@
         <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g (${w.toFixed(1)} g per pie)
       `;
       document.getElementById("result").innerHTML = result;
+    }
+
+    function saveRecipe() {
+      let name = document.getElementById("recipeName").value.trim();
+      if (!name) {
+        alert("Please enter a recipe name!");
+        return;
+      }
+      let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
+      let inputs = {
+        numPies: document.getElementById("numPies").value,
+        targetWeight: document.getElementById("targetWeight").value,
+        residue: document.getElementById("residue").value,
+        hydration: document.getElementById("hydration").value,
+        bigaFlour: document.getElementById("bigaFlour").value,
+        bigaHydration: document.getElementById("bigaHydration").value,
+        totalYeast: document.getElementById("totalYeast").value,
+        bigaYeast: document.getElementById("bigaYeast").value,
+        salt: document.getElementById("salt").value,
+        sugar: document.getElementById("sugar").value,
+        oil: document.getElementById("oil").value,
+        malt: document.getElementById("malt").value,
+        notes: document.getElementById("notes").value
+      };
+      recipes[name] = inputs;
+      localStorage.setItem('pizzaRecipes', JSON.stringify(recipes));
+
+      let select = document.getElementById("recipeSelect");
+      if (!select.querySelector(`option[value="${name}"]`)) {
+        let option = document.createElement("option");
+        option.value = name;
+        option.text = name;
+        select.appendChild(option);
+      }
+      alert("Recipe '" + name + "' saved!");
+    }
+
+    function loadRecipe() {
+      let name = document.getElementById("recipeSelect").value;
+      if (!name) return;
+      let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
+      let recipe = recipes[name];
+      if (recipe) {
+        document.getElementById("numPies").value = recipe.numPies;
+        document.getElementById("targetWeight").value = recipe.targetWeight;
+        document.getElementById("residue").value = recipe.residue;
+        document.getElementById("hydration").value = recipe.hydration;
+        document.getElementById("bigaFlour").value = recipe.bigaFlour;
+        document.getElementById("bigaHydration").value = recipe.bigaHydration;
+        document.getElementById("totalYeast").value = recipe.totalYeast;
+        document.getElementById("bigaYeast").value = recipe.bigaYeast;
+        document.getElementById("salt").value = recipe.salt;
+        document.getElementById("sugar").value = recipe.sugar;
+        document.getElementById("oil").value = recipe.oil;
+        document.getElementById("malt").value = recipe.malt;
+        document.getElementById("notes").value = recipe.notes || "";
+        calculate(); // Recalculate with loaded values
+      }
     }
   </script>
 </body>
