@@ -11,9 +11,9 @@
     h2 { color: #333; }
     label { display: block; margin: 5px 0; font-size: 16px; }
     input, select, textarea { width: 120px; padding: 3px; margin-left: 10px; }
-    button { margin: 10px 5px 0 0; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #45a049; }
-    #result { margin-top: 20px; font-size: 16px; line-height: 1.5; background: white; padding: 10px; border-radius: 5px; }
+    button { margin: 10px 5px 0 0; padding: 8px 15px; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    #result { margin-top: 20px; font-size: 16px; line-height: 1.8; background: white; padding: 15px; border-radius: 5px; }
     #notes { width: 200px; height: 80px; vertical-align: top; }
   </style>
 </head>
@@ -47,7 +47,6 @@
         .catch(err => console.log('Service Worker Failed', err));
     }
 
-    // Load saved recipes on start
     window.onload = function() {
       let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
       let select = document.getElementById('recipeSelect');
@@ -93,25 +92,25 @@
       let maltW = flour * m;
 
       let result = `
-        <b>Total Pre-Residue (for ${n} pie${n > 1 ? 's' : ''}):</b> ${preW.toFixed(1)} g<br>
+        <b>Total Pre-Residue (for ${n} pie${n > 1 ? 's' : ''}):</b> ${preW.toFixed(1)} g<br><br>
         <b>Total Flour:</b> ${flour.toFixed(1)} g<br>
         <b>Total Water:</b> ${water.toFixed(1)} g<br>
-        <b>Total Yeast:</b> ${yeast.toFixed(2)} g<br>
+        <b>Total Yeast:</b> ${yeast.toFixed(2)} g<br><br>
         <b>Biga:</b><br>
-        - Flour: ${bigaF.toFixed(1)} g (${(bigaF/n).toFixed(1)} g per pie)<br>
-        - Water: ${bigaW.toFixed(1)} g (${(bigaW/n).toFixed(1)} g per pie)<br>
-        - Yeast: ${bigaY.toFixed(2)} g (${(bigaY/n).toFixed(2)} g per pie)<br>
-        - Total: ${(bigaF + bigaW + bigaY).toFixed(1)} g (${((bigaF + bigaW + bigaY)/n).toFixed(1)} g per pie)<br>
+        - Flour: ${bigaF.toFixed(1)} g &nbsp;&nbsp; (${(bigaF/n).toFixed(1)} g per pie)<br>
+        - Water: ${bigaW.toFixed(1)} g &nbsp;&nbsp; (${(bigaW/n).toFixed(1)} g per pie)<br>
+        - Yeast: ${bigaY.toFixed(2)} g &nbsp;&nbsp; (${(bigaY/n).toFixed(2)} g per pie)<br>
+        - Total: ${(bigaF + bigaW + bigaY).toFixed(1)} g &nbsp;&nbsp; (${((bigaF + bigaW + bigaY)/n).toFixed(1)} g per pie)<br><br>
         <b>Final Dough:</b><br>
-        - Flour: ${finalF.toFixed(1)} g (${(finalF/n).toFixed(1)} g per pie)<br>
-        - Water: ${finalW.toFixed(1)} g (${(finalW/n).toFixed(1)} g per pie)<br>
-        - Yeast: ${finalY.toFixed(2)} g (${(finalY/n).toFixed(2)} g per pie)<br>
-        - Salt: ${saltW.toFixed(1)} g (${(saltW/n).toFixed(1)} g per pie)<br>
-        - Sugar: ${sugarW.toFixed(1)} g (${(sugarW/n).toFixed(1)} g per pie)<br>
-        - Olive Oil: ${oilW.toFixed(1)} g (${(oilW/n).toFixed(1)} g per pie)<br>
-        - Diastatic Malt: ${maltW.toFixed(1)} g (${(maltW/n).toFixed(1)} g per pie)<br>
-        - Total (with biga): ${preW.toFixed(1)} g (${(preW/n).toFixed(1)} g per pie)<br>
-        <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g (${w.toFixed(1)} g per pie)
+        - Flour: ${finalF.toFixed(1)} g &nbsp;&nbsp; (${(finalF/n).toFixed(1)} g per pie)<br>
+        - Water: ${finalW.toFixed(1)} g &nbsp;&nbsp; (${(finalW/n).toFixed(1)} g per pie)<br>
+        - Yeast: ${finalY.toFixed(2)} g &nbsp;&nbsp; (${(finalY/n).toFixed(2)} g per pie)<br>
+        - Salt: ${saltW.toFixed(1)} g &nbsp;&nbsp; (${(saltW/n).toFixed(1)} g per pie)<br>
+        - Sugar: ${sugarW.toFixed(1)} g &nbsp;&nbsp; (${(sugarW/n).toFixed(1)} g per pie)<br>
+        - Olive Oil: ${oilW.toFixed(1)} g &nbsp;&nbsp; (${(oilW/n).toFixed(1)} g per pie)<br>
+        - Diastatic Malt: ${maltW.toFixed(1)} g &nbsp;&nbsp; (${(maltW/n).toFixed(1)} g per pie)<br>
+        - Total (with biga): ${preW.toFixed(1)} g &nbsp;&nbsp; (${(preW/n).toFixed(1)} g per pie)<br><br>
+        <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g &nbsp;&nbsp; (${w.toFixed(1)} g per pie)
       `;
       document.getElementById("result").innerHTML = result;
     }
@@ -170,7 +169,7 @@
         document.getElementById("oil").value = recipe.oil;
         document.getElementById("malt").value = recipe.malt;
         document.getElementById("notes").value = recipe.notes || "";
-        calculate(); // Recalculate with loaded values
+        calculate();
       }
     }
   </script>
