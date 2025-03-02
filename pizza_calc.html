@@ -39,6 +39,7 @@
   <label>Notes: <textarea id="notes" placeholder="How did it turn out?"></textarea></label>
   <button onclick="calculate()">Calculate</button>
   <button onclick="saveRecipe()">Save Recipe</button>
+  <button onclick="deleteRecipe()">Delete Recipe</button>
   <div id="result"></div>
 
   <script>
@@ -171,6 +172,27 @@
         document.getElementById("malt").value = recipe.malt;
         document.getElementById("notes").value = recipe.notes || "";
         calculate();
+      }
+    }
+
+    function deleteRecipe() {
+      let name = document.getElementById("recipeSelect").value;
+      if (!name) {
+        alert("Please select a recipe to delete!");
+        return;
+      }
+      if (confirm("Delete recipe '" + name + "'?")) {
+        let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
+        delete recipes[name];
+        localStorage.setItem('pizzaRecipes', JSON.stringify(recipes));
+
+        let select = document.getElementById("recipeSelect");
+        let option = select.querySelector(`option[value="${name}"]`);
+        if (option) select.removeChild(option);
+        select.value = "";
+        document.getElementById("recipeName").value = "";
+        document.getElementById("notes").value = "";
+        alert("Recipe '" + name + "' deleted!");
       }
     }
   </script>
