@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="manifest" href="manifest.json">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #E6F0FA; }
     h2 { color: #333; }
     label { display: block; margin: 5px 0; font-size: 16px; }
     input, select, textarea { width: 120px; padding: 3px; margin-left: 10px; }
@@ -97,20 +97,20 @@
         <b>Total Water:</b> ${water.toFixed(1)} g<br>
         <b>Total Yeast:</b> ${yeast.toFixed(2)} g<br><br>
         <b>Biga:</b><br>
-        - Flour: ${bigaF.toFixed(1)} g &nbsp;&nbsp; (${(bigaF/n).toFixed(1)} g per pie)<br>
-        - Water: ${bigaW.toFixed(1)} g &nbsp;&nbsp; (${(bigaW/n).toFixed(1)} g per pie)<br>
-        - Yeast: ${bigaY.toFixed(2)} g &nbsp;&nbsp; (${(bigaY/n).toFixed(2)} g per pie)<br>
-        - Total: ${(bigaF + bigaW + bigaY).toFixed(1)} g &nbsp;&nbsp; (${((bigaF + bigaW + bigaY)/n).toFixed(1)} g per pie)<br><br>
+        - Flour: ${bigaF.toFixed(1)} g<br>
+        - Water: ${bigaW.toFixed(1)} g<br>
+        - Yeast: ${bigaY.toFixed(2)} g<br>
+        - Total: ${(bigaF + bigaW + bigaY).toFixed(1)} g<br><br>
         <b>Final Dough:</b><br>
-        - Flour: ${finalF.toFixed(1)} g &nbsp;&nbsp; (${(finalF/n).toFixed(1)} g per pie)<br>
-        - Water: ${finalW.toFixed(1)} g &nbsp;&nbsp; (${(finalW/n).toFixed(1)} g per pie)<br>
-        - Yeast: ${finalY.toFixed(2)} g &nbsp;&nbsp; (${(finalY/n).toFixed(2)} g per pie)<br>
-        - Salt: ${saltW.toFixed(1)} g &nbsp;&nbsp; (${(saltW/n).toFixed(1)} g per pie)<br>
-        - Sugar: ${sugarW.toFixed(1)} g &nbsp;&nbsp; (${(sugarW/n).toFixed(1)} g per pie)<br>
-        - Olive Oil: ${oilW.toFixed(1)} g &nbsp;&nbsp; (${(oilW/n).toFixed(1)} g per pie)<br>
-        - Diastatic Malt: ${maltW.toFixed(1)} g &nbsp;&nbsp; (${(maltW/n).toFixed(1)} g per pie)<br>
-        - Total (with biga): ${preW.toFixed(1)} g &nbsp;&nbsp; (${(preW/n).toFixed(1)} g per pie)<br><br>
-        <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g &nbsp;&nbsp; (${w.toFixed(1)} g per pie)
+        - Flour: ${finalF.toFixed(1)} g<br>
+        - Water: ${finalW.toFixed(1)} g<br>
+        - Yeast: ${finalY.toFixed(2)} g<br>
+        - Salt: ${saltW.toFixed(1)} g<br>
+        - Sugar: ${sugarW.toFixed(1)} g<br>
+        - Olive Oil: ${oilW.toFixed(1)} g<br>
+        - Diastatic Malt: ${maltW.toFixed(1)} g<br>
+        - Total (with biga): ${preW.toFixed(1)} g    (${(preW/n).toFixed(1)} g per pie)<br><br>
+        <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g
       `;
       document.getElementById("result").innerHTML = result;
     }
