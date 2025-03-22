@@ -43,6 +43,7 @@
   <label>Cheese 3 Name: <input type="text" id="cheese3Name" value="Parmesan"></label>
   <h3>Sauce</h3>
   <label>Total Sauce (g per pie): <input type="number" id="totalSauce" value="90"></label>
+  <label>Total Sauce Amount (g): <input type="number" id="totalSauceAmount" value="360" readonly></label>
   <label>Salt (% of sauce): <input type="number" id="sauceSalt" value="0.5" step="0.1"></label>
   <label>Garlic Powder (% of sauce): <input type="number" id="sauceGarlic" value="0.2" step="0.1"></label>
   <label>Saved Recipes: <select id="recipeSelect" onchange="loadRecipe()">
@@ -72,6 +73,7 @@
         option.text = name;
         select.appendChild(option);
       }
+      calculate(); // Initial calc to set total sauce
     };
 
     function calculate() {
@@ -121,8 +123,11 @@
       let cheese1W = tc * c1;
       let cheese2W = tc * c2;
       let cheese3W = tc * c3;
+      let totalSauceAmt = ts * n;
       let sauceSaltW = ts * ss;
       let sauceGarlicW = ts * sg;
+
+      document.getElementById("totalSauceAmount").value = totalSauceAmt.toFixed(1);
 
       let result = `
         <b>Total Pre-Residue (for ${n} pie${n > 1 ? 's' : ''}):</b> ${preW.toFixed(1)} g<br><br>
@@ -149,8 +154,9 @@
         - ${c2Name}: ${cheese2W.toFixed(1)} g (${(c2 * 100).toFixed(0)}%)<br>
         - ${c3Name}: ${cheese3W.toFixed(1)} g (${(c3 * 100).toFixed(0)}%)<br>
         - Total: ${tc.toFixed(1)} g<br><br>
-        <b>Sauce (per pie):</b><br>
-        - Sauce: ${ts.toFixed(1)} g<br>
+        <b>Sauce:</b><br>
+        - Per Pie: ${ts.toFixed(1)} g<br>
+        - Total Amount: ${totalSauceAmt.toFixed(1)} g<br>
         - Salt: ${sauceSaltW.toFixed(1)} g<br>
         - Garlic Powder: ${sauceGarlicW.toFixed(1)} g<br><br>
         <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g
@@ -187,6 +193,7 @@
         cheese3: document.getElementById("cheese3").value,
         cheese3Name: document.getElementById("cheese3Name").value,
         totalSauce: document.getElementById("totalSauce").value,
+        totalSauceAmount: document.getElementById("totalSauceAmount").value,
         sauceSalt: document.getElementById("sauceSalt").value,
         sauceGarlic: document.getElementById("sauceGarlic").value,
         notes: document.getElementById("notes").value
@@ -245,6 +252,7 @@
         document.getElementById("cheese3").value = recipe.cheese3 || "1";
         document.getElementById("cheese3Name").value = recipe.cheese3Name || "Parmesan";
         document.getElementById("totalSauce").value = recipe.totalSauce || "90";
+        document.getElementById("totalSauceAmount").value = recipe.totalSauceAmount || "360";
         document.getElementById("sauceSalt").value = recipe.sauceSalt || "0.5";
         document.getElementById("sauceGarlic").value = recipe.sauceGarlic || "0.2";
         document.getElementById("notes").value = recipe.notes || "";
