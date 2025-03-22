@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json">
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #E6F0FA; margin: 0; }
-    h2 { color: #333; }
+    h2, h3 { color: #333; }
     label { display: block; margin: 5px 0; font-size: 16px; }
     input, select, textarea { width: 120px; padding: 3px; margin-left: 10px; }
     button { margin: 10px 5px 0 0; padding: 8px 15px; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
@@ -20,18 +20,28 @@
 </head>
 <body>
   <h2>NY-Style Pizza Dough Calculator</h2>
-  <label>Number of Pies: <input type="number" id="numPies" value="1" min="1"></label>
+  <label>Number of Pies: <input type="number" id="numPies" value="4" min="1"></label>
   <label>Target Weight per Pie (g, post-residue): <input type="number" id="targetWeight" value="340"></label>
   <label>Bowl Residue (%): <input type="number" id="residue" value="4" step="0.1"></label>
-  <label>Hydration (%): <input type="number" id="hydration" value="63" step="0.1"></label>
+  <label>Hydration (%): <input type="number" id="hydration" value="70" step="0.1"></label>
   <label>Biga Flour (% of total): <input type="number" id="bigaFlour" value="40" step="0.1"></label>
   <label>Biga Hydration (%): <input type="number" id="bigaHydration" value="63" step="0.1"></label>
   <label>Total Yeast (% of flour): <input type="number" id="totalYeast" value="0.4" step="0.01"></label>
-  <label>Biga Yeast (% of total yeast): <input type="number" id="bigaYeast" value="25" step="0.1"></label>
-  <label>Salt (%): <input type="number" id="salt" value="2.5" step="0.1"></label>
+  <label>Biga Yeast (% of total yeast): <input type="number" id="bigaYeast" value="13.3" step="0.1"></label>
+  <label>Salt (%): <input type="number" id="salt" value="1.8" step="0.1"></label>
   <label>Sugar (%): <input type="number" id="sugar" value="1.5" step="0.1"></label>
   <label>Olive Oil (%): <input type="number" id="oil" value="2" step="0.1"></label>
   <label>Diastatic Malt (%): <input type="number" id="malt" value="0.5" step="0.1"></label>
+  <label>MSG (%): <input type="number" id="msg" value="0" step="0.1"></label>
+  <h3>Cheese</h3>
+  <label>Total Cheese (g per pie): <input type="number" id="totalCheese" value="212"></label>
+  <label>Cheese 1 (% of total): <input type="number" id="cheese1" value="80" step="1"></label>
+  <label>Cheese 2 (% of total): <input type="number" id="cheese2" value="19" step="1"></label>
+  <label>Cheese 3 (% of total): <input type="number" id="cheese3" value="1" step="1"></label>
+  <h3>Sauce</h3>
+  <label>Total Sauce (g per pie): <input type="number" id="totalSauce" value="100"></label>
+  <label>Salt (% of sauce): <input type="number" id="sauceSalt" value="0.5" step="0.1"></label>
+  <label>Garlic Powder (% of sauce): <input type="number" id="sauceGarlic" value="0.2" step="0.1"></label>
   <label>Saved Recipes: <select id="recipeSelect" onchange="loadRecipe()">
     <option value="">-- Select Recipe --</option>
   </select></label>
@@ -39,6 +49,7 @@
   <label>Notes: <textarea id="notes" placeholder="How did it turn out?"></textarea></label>
   <button onclick="calculate()">Calculate</button>
   <button onclick="saveRecipe()">Save Recipe</button>
+  <button onclick="updateRecipe()">Update Recipe</button>
   <button onclick="deleteRecipe()">Delete Recipe</button>
   <div id="result"></div>
 
@@ -73,10 +84,18 @@
       let su = parseFloat(document.getElementById("sugar").value) / 100;
       let o = parseFloat(document.getElementById("oil").value) / 100;
       let m = parseFloat(document.getElementById("malt").value) / 100;
+      let msg = parseFloat(document.getElementById("msg").value) / 100;
+      let tc = parseFloat(document.getElementById("totalCheese").value);
+      let c1 = parseFloat(document.getElementById("cheese1").value) / 100;
+      let c2 = parseFloat(document.getElementById("cheese2").value) / 100;
+      let c3 = parseFloat(document.getElementById("cheese3").value) / 100;
+      let ts = parseFloat(document.getElementById("totalSauce").value);
+      let ss = parseFloat(document.getElementById("sauceSalt").value) / 100;
+      let sg = parseFloat(document.getElementById("sauceGarlic").value) / 100;
 
       let totalW = w * n;
       let preW = totalW / (1 - r);
-      let totalP = 1 + h + s + su + o + m + y;
+      let totalP = 1 + h + s + su + o + m + y + msg;
       let flour = preW / totalP;
 
       let water = flour * h;
@@ -92,6 +111,12 @@
       let sugarW = flour * su;
       let oilW = flour * o;
       let maltW = flour * m;
+      let msgW = flour * msg;
+      let cheese1W = tc * c1;
+      let cheese2W = tc * c2;
+      let cheese3W = tc * c3;
+      let sauceSaltW = ts * ss;
+      let sauceGarlicW = ts * sg;
 
       let result = `
         <b>Total Pre-Residue (for ${n} pie${n > 1 ? 's' : ''}):</b> ${preW.toFixed(1)} g<br><br>
@@ -111,7 +136,17 @@
         - Sugar: ${sugarW.toFixed(1)} g<br>
         - Olive Oil: ${oilW.toFixed(1)} g<br>
         - Diastatic Malt: ${maltW.toFixed(1)} g<br>
+        - MSG: ${msgW.toFixed(1)} g<br>
         - Total (with biga): ${preW.toFixed(1)} g    (${(preW/n).toFixed(1)} g per pie)<br><br>
+        <b>Cheese (per pie):</b><br>
+        - Cheese 1: ${cheese1W.toFixed(1)} g<br>
+        - Cheese 2: ${cheese2W.toFixed(1)} g<br>
+        - Cheese 3: ${cheese3W.toFixed(1)} g<br>
+        - Total: ${tc.toFixed(1)} g<br><br>
+        <b>Sauce (per pie):</b><br>
+        - Sauce: ${ts.toFixed(1)} g<br>
+        - Salt: ${sauceSaltW.toFixed(1)} g<br>
+        - Garlic Powder: ${sauceGarlicW.toFixed(1)} g<br><br>
         <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g
       `;
       document.getElementById("result").innerHTML = result;
@@ -137,6 +172,14 @@
         sugar: document.getElementById("sugar").value,
         oil: document.getElementById("oil").value,
         malt: document.getElementById("malt").value,
+        msg: document.getElementById("msg").value,
+        totalCheese: document.getElementById("totalCheese").value,
+        cheese1: document.getElementById("cheese1").value,
+        cheese2: document.getElementById("cheese2").value,
+        cheese3: document.getElementById("cheese3").value,
+        totalSauce: document.getElementById("totalSauce").value,
+        sauceSalt: document.getElementById("sauceSalt").value,
+        sauceGarlic: document.getElementById("sauceGarlic").value,
         notes: document.getElementById("notes").value
       };
       recipes[name] = inputs;
@@ -149,7 +192,21 @@
         option.text = name;
         select.appendChild(option);
       }
+      select.value = name;
       alert("Recipe '" + name + "' saved!");
+    }
+
+    function updateRecipe() {
+      let name = document.getElementById("recipeSelect").value;
+      if (!name) {
+        alert("Please select a recipe to update!");
+        return;
+      }
+      if (confirm("Update recipe '" + name + "'?")) {
+        document.getElementById("recipeName").value = name;
+        saveRecipe();
+        alert("Recipe '" + name + "' updated!");
+      }
     }
 
     function loadRecipe() {
@@ -158,18 +215,26 @@
       let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
       let recipe = recipes[name];
       if (recipe) {
-        document.getElementById("numPies").value = recipe.numPies;
-        document.getElementById("targetWeight").value = recipe.targetWeight;
-        document.getElementById("residue").value = recipe.residue;
-        document.getElementById("hydration").value = recipe.hydration;
-        document.getElementById("bigaFlour").value = recipe.bigaFlour;
-        document.getElementById("bigaHydration").value = recipe.bigaHydration;
-        document.getElementById("totalYeast").value = recipe.totalYeast;
-        document.getElementById("bigaYeast").value = recipe.bigaYeast;
-        document.getElementById("salt").value = recipe.salt;
-        document.getElementById("sugar").value = recipe.sugar;
-        document.getElementById("oil").value = recipe.oil;
-        document.getElementById("malt").value = recipe.malt;
+        document.getElementById("numPies").value = recipe.numPies || "4";
+        document.getElementById("targetWeight").value = recipe.targetWeight || "340";
+        document.getElementById("residue").value = recipe.residue || "4";
+        document.getElementById("hydration").value = recipe.hydration || "70";
+        document.getElementById("bigaFlour").value = recipe.bigaFlour || "40";
+        document.getElementById("bigaHydration").value = recipe.bigaHydration || "63";
+        document.getElementById("totalYeast").value = recipe.totalYeast || "0.4";
+        document.getElementById("bigaYeast").value = recipe.bigaYeast || "13.3";
+        document.getElementById("salt").value = recipe.salt || "1.8";
+        document.getElementById("sugar").value = recipe.sugar || "1.5";
+        document.getElementById("oil").value = recipe.oil || "2";
+        document.getElementById("malt").value = recipe.malt || "0.5";
+        document.getElementById("msg").value = recipe.msg || "0";
+        document.getElementById("totalCheese").value = recipe.totalCheese || "212";
+        document.getElementById("cheese1").value = recipe.cheese1 || "80";
+        document.getElementById("cheese2").value = recipe.cheese2 || "19";
+        document.getElementById("cheese3").value = recipe.cheese3 || "1";
+        document.getElementById("totalSauce").value = recipe.totalSauce || "100";
+        document.getElementById("sauceSalt").value = recipe.sauceSalt || "0.5";
+        document.getElementById("sauceGarlic").value = recipe.sauceGarlic || "0.2";
         document.getElementById("notes").value = recipe.notes || "";
         calculate();
       }
