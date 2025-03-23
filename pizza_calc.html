@@ -5,53 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="theme-color" content="#007BFF">
+  <meta name="theme-color" content="#FF4500">
   <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #E6F0FA; margin: 0; }
-    h2, h3 { color: #333; }
-    label { display: block; margin: 5px 0; font-size: 16px; }
-    input, select, textarea { width: 120px; padding: 3px; margin-left: 10px; }
-    button { margin: 10px 5px 0 0; padding: 8px 15px; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    #result { margin-top: 20px; font-size: 16px; line-height: 1.8; background: white; padding: 15px; border-radius: 5px; }
+    body { font-family: 'Roboto', sans-serif; padding: 20px; background: #F5F5F5; margin: 0; }
+    h2, h3 { color: #333; margin: 15px 0 10px; }
+    label { display: block; margin: 8px 0; font-size: 18px; font-weight: 400; }
+    input, select, textarea { 
+      width: 150px; padding: 5px; margin-left: 10px; border: 1px solid #CCC; 
+      border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 16px; 
+    }
+    button { 
+      margin: 15px 10px 0 0; padding: 10px 20px; background: linear-gradient(#FF4500, #D93A00); 
+      color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; 
+    }
+    button:hover { background: linear-gradient(#D93A00, #B32F00); }
+    #calculateBtn { animation: pulse 2s infinite; }
+    #result { 
+      margin-top: 20px; font-size: 16px; line-height: 1.8; background: #FFF8E1; 
+      padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    }
+    #result b { font-weight: 700; }
     #notes { width: 200px; height: 80px; vertical-align: top; }
+    .section { margin-bottom: 20px; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
   </style>
 </head>
 <body>
   <h2>NY-Style Pizza Dough Calculator</h2>
-  <label>Number of Pies: <input type="number" id="numPies" value="4" min="1"></label>
-  <label>Target Weight per Pie (g, post-residue): <input type="number" id="targetWeight" value="340"></label>
-  <label>Bowl Residue (%): <input type="number" id="residue" value="4" step="0.1"></label>
-  <label>Hydration (%): <input type="number" id="hydration" value="70" step="0.1"></label>
-  <label>Biga Flour (% of total): <input type="number" id="bigaFlour" value="40" step="0.1"></label>
-  <label>Biga Hydration (%): <input type="number" id="bigaHydration" value="63" step="0.1"></label>
-  <label>Total Yeast (% of flour): <input type="number" id="totalYeast" value="0.4" step="0.01"></label>
-  <label>Biga Yeast (% of total yeast): <input type="number" id="bigaYeast" value="13.3" step="0.1"></label>
-  <label>Salt (%): <input type="number" id="salt" value="1.8" step="0.1"></label>
-  <label>Sugar (%): <input type="number" id="sugar" value="1.5" step="0.1"></label>
-  <label>Olive Oil (%): <input type="number" id="oil" value="2" step="0.1"></label>
-  <label>Diastatic Malt (%): <input type="number" id="malt" value="0.5" step="0.1"></label>
-  <label>MSG (%): <input type="number" id="msg" value="0" step="0.1"></label>
-  <h3>Cheese</h3>
-  <label>Total Cheese (g per pie): <input type="number" id="totalCheese" value="212"></label>
-  <label>Cheese 1 (%): <input type="number" id="cheese1" value="80" step="1"></label>
-  <label>Cheese 1 Name: <input type="text" id="cheese1Name" value="Mozzarella"></label>
-  <label>Cheese 2 (%): <input type="number" id="cheese2" value="19" step="1"></label>
-  <label>Cheese 2 Name: <input type="text" id="cheese2Name" value="Provolone"></label>
-  <label>Cheese 3 (%): <input type="number" id="cheese3" value="1" step="1"></label>
-  <label>Cheese 3 Name: <input type="text" id="cheese3Name" value="Parmesan"></label>
-  <h3>Sauce</h3>
-  <label>Total Sauce (g per pie): <input type="number" id="totalSauce" value="90"></label>
-  <label>Total Sauce Amount (g): <input type="number" id="totalSauceAmount" value="360" readonly></label>
-  <label>Salt (% of sauce): <input type="number" id="sauceSalt" value="0.5" step="0.1"></label>
-  <label>Garlic Powder (% of sauce): <input type="number" id="sauceGarlic" value="0.2" step="0.1"></label>
-  <label>Saved Recipes: <select id="recipeSelect" onchange="loadRecipe()">
-    <option value="">-- Select Recipe --</option>
-  </select></label>
-  <label>Recipe Name: <input type="text" id="recipeName" placeholder="Enter name"></label>
-  <label>Notes: <textarea id="notes" placeholder="How did it turn out?"></textarea></label>
-  <button onclick="calculate()">Calculate</button>
+  <div class="section">
+    <label>Number of Pies: <input type="number" id="numPies" value="4" min="1"></label>
+    <label>Target Weight per Pie (g, post-residue): <input type="number" id="targetWeight" value="340"></label>
+    <label>Bowl Residue (%): <input type="number" id="residue" value="4" step="0.1"></label>
+    <label>Hydration (%): <input type="number" id="hydration" value="70" step="0.1"></label>
+    <label>Biga Flour (% of total): <input type="number" id="bigaFlour" value="40" step="0.1"></label>
+    <label>Biga Hydration (%): <input type="number" id="bigaHydration" value="63" step="0.1"></label>
+    <label>Total Yeast (% of flour): <input type="number" id="totalYeast" value="0.4" step="0.01"></label>
+    <label>Biga Yeast (% of total yeast): <input type="number" id="bigaYeast" value="13.3" step="0.1"></label>
+    <label>Salt (%): <input type="number" id="salt" value="1.8" step="0.1"></label>
+    <label>Sugar (%): <input type="number" id="sugar" value="1.5" step="0.1"></label>
+    <label>Olive Oil (%): <input type="number" id="oil" value="2" step="0.1"></label>
+    <label>Diastatic Malt (%): <input type="number" id="malt" value="0.5" step="0.1"></label>
+    <label>MSG (%): <input type="number" id="msg" value="0" step="0.1"></label>
+  </div>
+  <div class="section">
+    <h3>Cheese</h3>
+    <label>Total Cheese (g per pie): <input type="number" id="totalCheese" value="212"></label>
+    <label>Cheese 1 Name: <input type="text" id="cheese1Name" value="Mozzarella"></label>
+    <label>Cheese 1 (%): <input type="number" id="cheese1" value="80" step="1"></label>
+    <label>Cheese 2 Name: <input type="text" id="cheese2Name" value="Provolone"></label>
+    <label>Cheese 2 (%): <input type="number" id="cheese2" value="19" step="1"></label>
+    <label>Cheese 3 Name: <input type="text" id="cheese3Name" value="Parmesan"></label>
+    <label>Cheese 3 (%): <input type="number" id="cheese3" value="1" step="1"></label>
+  </div>
+  <div class="section">
+    <h3>Sauce</h3>
+    <label>Total Sauce (g per pie): <input type="number" id="totalSauce" value="90"></label>
+    <label>Total Sauce Amount (g): <input type="number" id="totalSauceAmount" value="360" readonly></label>
+    <label>Salt (% of sauce): <input type="number" id="sauceSalt" value="0.5" step="0.1"></label>
+    <label>Garlic Powder (% of sauce): <input type="number" id="sauceGarlic" value="0.2" step="0.1"></label>
+    <label>Oregano (% of sauce): <input type="number" id="sauceOregano" value="0.3" step="0.1"></label>
+  </div>
+  <div class="section">
+    <label>Saved Recipes: <select id="recipeSelect" onchange="loadRecipe()">
+      <option value="">-- Select Recipe --</option>
+    </select></label>
+    <label>Recipe Name: <input type="text" id="recipeName" placeholder="Enter name"></label>
+    <label>Notes: <textarea id="notes" placeholder="How did it turn out?"></textarea></label>
+  </div>
+  <button id="calculateBtn" onclick="calculate()">Calculate</button>
   <button onclick="saveRecipe()">Save Recipe</button>
   <button onclick="updateRecipe()">Update Recipe</button>
   <button onclick="deleteRecipe()">Delete Recipe</button>
@@ -73,7 +96,7 @@
         option.text = name;
         select.appendChild(option);
       }
-      calculate(); // Initial calc to set total sauce
+      calculate();
     };
 
     function calculate() {
@@ -100,6 +123,7 @@
       let ts = parseFloat(document.getElementById("totalSauce").value);
       let ss = parseFloat(document.getElementById("sauceSalt").value) / 100;
       let sg = parseFloat(document.getElementById("sauceGarlic").value) / 100;
+      let so = parseFloat(document.getElementById("sauceOregano").value) / 100;
 
       let totalW = w * n;
       let preW = totalW / (1 - r);
@@ -126,6 +150,7 @@
       let totalSauceAmt = ts * n;
       let sauceSaltW = ts * ss;
       let sauceGarlicW = ts * sg;
+      let sauceOreganoW = ts * so;
 
       document.getElementById("totalSauceAmount").value = totalSauceAmt.toFixed(1);
 
@@ -155,10 +180,11 @@
         - ${c3Name}: ${cheese3W.toFixed(1)} g (${(c3 * 100).toFixed(0)}%)<br>
         - Total: ${tc.toFixed(1)} g<br><br>
         <b>Sauce:</b><br>
-        - Per Pie: ${ts.toFixed(1)} g<br>
         - Total Amount: ${totalSauceAmt.toFixed(1)} g<br>
+        - Per Pie: ${ts.toFixed(1)} g<br>
         - Salt: ${sauceSaltW.toFixed(1)} g<br>
-        - Garlic Powder: ${sauceGarlicW.toFixed(1)} g<br><br>
+        - Garlic Powder: ${sauceGarlicW.toFixed(1)} g<br>
+        - Oregano: ${sauceOreganoW.toFixed(1)} g<br><br>
         <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g
       `;
       document.getElementById("result").innerHTML = result;
@@ -196,6 +222,7 @@
         totalSauceAmount: document.getElementById("totalSauceAmount").value,
         sauceSalt: document.getElementById("sauceSalt").value,
         sauceGarlic: document.getElementById("sauceGarlic").value,
+        sauceOregano: document.getElementById("sauceOregano").value,
         notes: document.getElementById("notes").value
       };
       recipes[name] = inputs;
@@ -255,6 +282,7 @@
         document.getElementById("totalSauceAmount").value = recipe.totalSauceAmount || "360";
         document.getElementById("sauceSalt").value = recipe.sauceSalt || "0.5";
         document.getElementById("sauceGarlic").value = recipe.sauceGarlic || "0.2";
+        document.getElementById("sauceOregano").value = recipe.sauceOregano || "0.3";
         document.getElementById("notes").value = recipe.notes || "";
         calculate();
       }
