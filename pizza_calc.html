@@ -148,6 +148,9 @@
       let cheese1W = tc * c1;
       let cheese2W = tc * c2;
       let cheese3W = tc * c3;
+      let totalCheese1W = cheese1W * n;
+      let totalCheese2W = cheese2W * n;
+      let totalCheese3W = cheese3W * n;
       let totalSauceAmt = ts * n;
       let sauceSaltW = ts * ss;
       let sauceGarlicW = ts * sg;
@@ -175,11 +178,11 @@
         - Diastatic Malt: ${maltW.toFixed(1)} g<br>
         - MSG: ${msgW.toFixed(1)} g<br>
         - Total (with biga): ${preW.toFixed(1)} g    (${(preW/n).toFixed(1)} g per pie)<br><br>
-        <b>Cheese (per pie):</b><br>
-        - ${c1Name}: ${cheese1W.toFixed(1)} g (${(c1 * 100).toFixed(0)}%)<br>
-        - ${c2Name}: ${cheese2W.toFixed(1)} g (${(c2 * 100).toFixed(0)}%)<br>
-        - ${c3Name}: ${cheese3W.toFixed(1)} g (${(c3 * 100).toFixed(0)}%)<br>
-        - Total: ${tc.toFixed(1)} g<br><br>
+        <b>Cheese:</b><br>
+        - ${c1Name}: ${totalCheese1W.toFixed(1)} g total (${cheese1W.toFixed(1)} g per pie, ${(c1 * 100).toFixed(0)}%)<br>
+        - ${c2Name}: ${totalCheese2W.toFixed(1)} g total (${cheese2W.toFixed(1)} g per pie, ${(c2 * 100).toFixed(0)}%)<br>
+        - ${c3Name}: ${totalCheese3W.toFixed(1)} g total (${cheese3W.toFixed(1)} g per pie, ${(c3 * 100).toFixed(0)}%)<br>
+        - Total: ${(tc * n).toFixed(1)} g (${tc.toFixed(1)} g per pie)<br><br>
         <b>Sauce:</b><br>
         - Total Amount: ${totalSauceAmt.toFixed(1)} g<br>
         - Per Pie: ${ts.toFixed(1)} g<br>
