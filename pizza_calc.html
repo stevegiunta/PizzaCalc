@@ -36,36 +36,36 @@
 <body>
   <h2>NY-Style Pizza Dough Calculator</h2>
   <div class="section">
-    <label>Number of Pies: <input type="number" id="numPies" value="4" min="1"></label>
+    <label>Number of Pies: <input type="number" id="numPies" value="3" min="1"></label>
     <label>Target Weight per Pie (g, post-residue): <input type="number" id="targetWeight" value="340"></label>
     <label>Bowl Residue (%): <input type="number" id="residue" value="4" step="0.1"></label>
-    <label>Hydration (%): <input type="number" id="hydration" value="70" step="0.1"></label>
-    <label>Biga Flour (% of total): <input type="number" id="bigaFlour" value="40" step="0.1"></label>
+    <label>Hydration (%): <input type="number" id="hydration" value="67" step="0.1"></label>
+    <label>Biga Flour (% of total): <input type="number" id="bigaFlour" value="30" step="0.1"></label>
     <label>Biga Hydration (%): <input type="number" id="bigaHydration" value="63" step="0.1"></label>
-    <label>Total Yeast (% of flour): <input type="number" id="totalYeast" value="0.4" step="0.01"></label>
+    <label>Total Yeast (% of flour): <input type="number" id="totalYeast" value="0.25" step="0.01"></label>
     <label>Biga Yeast (% of total yeast): <input type="number" id="bigaYeast" value="13.3" step="0.1"></label>
-    <label>Salt (%): <input type="number" id="salt" value="1.8" step="0.1"></label>
+    <label>Salt (%): <input type="number" id="salt" value="1.9" step="0.1"></label>
     <label>Sugar (%): <input type="number" id="sugar" value="1.5" step="0.1"></label>
-    <label>Olive Oil (%): <input type="number" id="oil" value="2" step="0.1"></label>
+    <label>Olive Oil (%): <input type="number" id="oil" value="2.5" step="0.1"></label>
     <label>Diastatic Malt (%): <input type="number" id="malt" value="0.5" step="0.1"></label>
-    <label>MSG (%): <input type="number" id="msg" value="0" step="0.1"></label>
+    <label>MSG (%): <input type="number" id="msg" value="0.28" step="0.1"></label>
   </div>
   <div class="section">
     <h3>Cheese</h3>
     <label>Total Cheese (g per pie): <input type="number" id="totalCheese" value="212"></label>
-    <label>Cheese 1 Name: <input type="text" id="cheese1Name" value="Mozzarella"></label>
-    <label>Cheese 1 (%): <input type="number" id="cheese1" value="80" step="1"></label>
+    <label>Cheese 1 Name: <input type="text" id="cheese1Name" value="WMLM"></label>
+    <label>Cheese 1 (%): <input type="number" id="cheese1" value="95" step="1"></label>
     <label>Cheese 2 Name: <input type="text" id="cheese2Name" value="Provolone"></label>
-    <label>Cheese 2 (%): <input type="number" id="cheese2" value="19" step="1"></label>
+    <label>Cheese 2 (%): <input type="number" id="cheese2" value="0" step="1"></label>
     <label>Cheese 3 Name: <input type="text" id="cheese3Name" value="Parmesan"></label>
-    <label>Cheese 3 (%): <input type="number" id="cheese3" value="1" step="1"></label>
+    <label>Cheese 3 (%): <input type="number" id="cheese3" value="5" step="1"></label>
   </div>
   <div class="section">
     <h3>Sauce</h3>
     <label>Total Sauce (g per pie): <input type="number" id="totalSauce" value="90"></label>
-    <label>Total Sauce Amount (g): <input type="number" id="totalSauceAmount" value="360" readonly></label>
-    <label>Salt (% of sauce): <input type="number" id="sauceSalt" value="0.5" step="0.1"></label>
-    <label>Garlic Powder (% of sauce): <input type="number" id="sauceGarlic" value="0.2" step="0.1"></label>
+    <label>Total Sauce Amount (g): <input type="number" id="totalSauceAmount" value="270" readonly></label>
+    <label>Salt (% of sauce): <input type="number" id="sauceSalt" value="1" step="0.1"></label>
+    <label>Garlic Powder (% of sauce): <input type="number" id="sauceGarlic" value="0.5" step="0.1"></label>
     <label>Oregano (% of sauce): <input type="number" id="sauceOregano" value="0.3" step="0.1"></label>
   </div>
   <div class="section">
@@ -262,30 +262,30 @@
       let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
       let recipe = recipes[name];
       if (recipe) {
-        document.getElementById("numPies").value = recipe.numPies || "4";
+        document.getElementById("numPies").value = recipe.numPies || "3";
         document.getElementById("targetWeight").value = recipe.targetWeight || "340";
         document.getElementById("residue").value = recipe.residue || "4";
-        document.getElementById("hydration").value = recipe.hydration || "70";
-        document.getElementById("bigaFlour").value = recipe.bigaFlour || "40";
+        document.getElementById("hydration").value = recipe.hydration || "67";
+        document.getElementById("bigaFlour").value = recipe.bigaFlour || "30";
         document.getElementById("bigaHydration").value = recipe.bigaHydration || "63";
-        document.getElementById("totalYeast").value = recipe.totalYeast || "0.4";
+        document.getElementById("totalYeast").value = recipe.totalYeast || "0.25";
         document.getElementById("bigaYeast").value = recipe.bigaYeast || "13.3";
-        document.getElementById("salt").value = recipe.salt || "1.8";
+        document.getElementById("salt").value = recipe.salt || "1.9";
         document.getElementById("sugar").value = recipe.sugar || "1.5";
-        document.getElementById("oil").value = recipe.oil || "2";
+        document.getElementById("oil").value = recipe.oil || "2.5";
         document.getElementById("malt").value = recipe.malt || "0.5";
-        document.getElementById("msg").value = recipe.msg || "0";
+        document.getElementById("msg").value = recipe.msg || "0.28";
         document.getElementById("totalCheese").value = recipe.totalCheese || "212";
-        document.getElementById("cheese1").value = recipe.cheese1 || "80";
-        document.getElementById("cheese1Name").value = recipe.cheese1Name || "Mozzarella";
-        document.getElementById("cheese2").value = recipe.cheese2 || "19";
+        document.getElementById("cheese1").value = recipe.cheese1 || "95";
+        document.getElementById("cheese1Name").value = recipe.cheese1Name || "WMLM";
+        document.getElementById("cheese2").value = recipe.cheese2 || "0";
         document.getElementById("cheese2Name").value = recipe.cheese2Name || "Provolone";
-        document.getElementById("cheese3").value = recipe.cheese3 || "1";
+        document.getElementById("cheese3").value = recipe.cheese3 || "5";
         document.getElementById("cheese3Name").value = recipe.cheese3Name || "Parmesan";
         document.getElementById("totalSauce").value = recipe.totalSauce || "90";
-        document.getElementById("totalSauceAmount").value = recipe.totalSauceAmount || "360";
-        document.getElementById("sauceSalt").value = recipe.sauceSalt || "0.5";
-        document.getElementById("sauceGarlic").value = recipe.sauceGarlic || "0.2";
+        document.getElementById("totalSauceAmount").value = recipe.totalSauceAmount || "270";
+        document.getElementById("sauceSalt").value = recipe.sauceSalt || "1";
+        document.getElementById("sauceGarlic").value = recipe.sauceGarlic || "0.5";
         document.getElementById("sauceOregano").value = recipe.sauceOregano || "0.3";
         document.getElementById("notes").value = recipe.notes || "";
         calculate();
