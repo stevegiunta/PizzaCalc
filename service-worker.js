@@ -1,6 +1,6 @@
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open('pizza-calc-v3').then((cache) => { // Bump to v3
+    caches.open('pizza-calc-v4').then((cache) => { // Bump to v4
       return cache.addAll(['manifest.json']); // Only cache manifest
     })
   );
@@ -11,7 +11,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.filter((name) => name !== 'pizza-calc-v3')
+        cacheNames.filter((name) => name !== 'pizza-calc-v4')
           .map((name) => caches.delete(name))
       );
     })
@@ -35,7 +35,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       caches.match(event.request).then((response) => {
         return response || fetch(event.request).then((networkResponse) => {
-          return caches.open('pizza-calc-v3').then((cache) => {
+          return caches.open('pizza-calc-v4').then((cache) => {
             cache.put(event.request, networkResponse.clone());
             return networkResponse;
           });

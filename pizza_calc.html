@@ -1,4 +1,43 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html>
 <head>
   <title>NY-Style Pizza Dough Calculator</title>
@@ -40,6 +79,10 @@
     <label>Target Weight per Pie (g, post-residue): <input type="number" id="targetWeight" value="340"></label>
     <label>Bowl Residue (%): <input type="number" id="residue" value="4" step="0.1"></label>
     <label>Hydration (%): <input type="number" id="hydration" value="67" step="0.1"></label>
+    <label>Flour 1 Name: <input type="text" id="flour1Name" value="Bread Flour"></label>
+    <label>Flour 1 (%): <input type="number" id="flour1" value="60" step="1"></label>
+    <label>Flour 2 Name: <input type="text" id="flour2Name" value="00 Flour"></label>
+    <label>Flour 2 (%): <input type="number" id="flour2" value="40" step="1"></label>
     <label>Biga Flour (% of total): <input type="number" id="bigaFlour" value="30" step="0.1"></label>
     <label>Biga Hydration (%): <input type="number" id="bigaHydration" value="63" step="0.1"></label>
     <label>Total Yeast (% of flour): <input type="number" id="totalYeast" value="0.25" step="0.01"></label>
@@ -105,6 +148,10 @@
       let w = parseFloat(document.getElementById("targetWeight").value);
       let r = parseFloat(document.getElementById("residue").value) / 100;
       let h = parseFloat(document.getElementById("hydration").value) / 100;
+      let f1 = parseFloat(document.getElementById("flour1").value) / 100;
+      let f2 = parseFloat(document.getElementById("flour2").value) / 100;
+      let f1Name = document.getElementById("flour1Name").value;
+      let f2Name = document.getElementById("flour2Name").value;
       let bf = parseFloat(document.getElementById("bigaFlour").value) / 100;
       let bh = parseFloat(document.getElementById("bigaHydration").value) / 100;
       let y = parseFloat(document.getElementById("totalYeast").value) / 100;
@@ -126,18 +173,30 @@
       let sg = parseFloat(document.getElementById("sauceGarlic").value) / 100;
       let so = parseFloat(document.getElementById("sauceOregano").value) / 100;
 
+      // Validate flour percentages
+      if (Math.abs(f1 + f2 - 1) > 0.01) {
+        alert("Flour 1 and Flour 2 percentages must add to 100%!");
+        return;
+      }
+
       let totalW = w * n;
       let preW = totalW / (1 - r);
       let totalP = 1 + h + s + su + o + m + y + msg;
       let flour = preW / totalP;
 
+      let flour1W = flour * f1;
+      let flour2W = flour * f2;
       let water = flour * h;
       let yeast = flour * y;
       let bigaF = flour * bf;
       if (n === 1 && Math.abs(bigaF - 80) < 5) bigaF = 80;
+      let bigaF1 = bigaF * f1;
+      let bigaF2 = bigaF * f2;
       let bigaW = bigaF * bh;
       let bigaY = yeast * by;
       let finalF = flour - bigaF;
+      let finalF1 = finalF * f1;
+      let finalF2 = finalF * f2;
       let finalW = water - bigaW;
       let finalY = yeast - bigaY;
       let saltW = flour * s;
@@ -161,15 +220,19 @@
       let result = `
         <b>Total Pre-Residue (for ${n} pie${n > 1 ? 's' : ''}):</b> ${preW.toFixed(1)} g<br><br>
         <b>Total Flour:</b> ${flour.toFixed(1)} g<br>
+        - ${f1Name}: ${flour1W.toFixed(1)} g (${(f1 * 100).toFixed(0)}%)<br>
+        - ${f2Name}: ${flour2W.toFixed(1)} g (${(f2 * 100).toFixed(0)}%)<br>
         <b>Total Water:</b> ${water.toFixed(1)} g<br>
         <b>Total Yeast:</b> ${yeast.toFixed(2)} g<br><br>
         <b>Biga:</b><br>
-        - Flour: ${bigaF.toFixed(1)} g<br>
+        - ${f1Name}: ${bigaF1.toFixed(1)} g<br>
+        - ${f2Name}: ${bigaF2.toFixed(1)} g<br>
         - Water: ${bigaW.toFixed(1)} g<br>
         - Yeast: ${bigaY.toFixed(2)} g<br>
         - Total: ${(bigaF + bigaW + bigaY).toFixed(1)} g<br><br>
         <b>Final Dough:</b><br>
-        - Flour: ${finalF.toFixed(1)} g<br>
+        - ${f1Name}: ${finalF1.toFixed(1)} g<br>
+        - ${f2Name}: ${finalF2.toFixed(1)} g<br>
         - Water: ${finalW.toFixed(1)} g<br>
         - Yeast: ${finalY.toFixed(2)} g<br>
         - Salt: ${saltW.toFixed(1)} g<br>
@@ -177,7 +240,7 @@
         - Olive Oil: ${oilW.toFixed(1)} g<br>
         - Diastatic Malt: ${maltW.toFixed(1)} g<br>
         - MSG: ${msgW.toFixed(1)} g<br>
-        - Total (with biga): ${preW.toFixed(1)} g    (${(preW/n).toFixed(1)} g per pie)<br><br>
+        - Total (with biga): ${preW.toFixed(1)} g    (${(preW/n).toFixed(1)} g per pie)<br><br>
         <b>Cheese:</b><br>
         - ${c1Name}: ${totalCheese1W.toFixed(1)} g total (${cheese1W.toFixed(1)} g per pie, ${(c1 * 100).toFixed(0)}%)<br>
         - ${c2Name}: ${totalCheese2W.toFixed(1)} g total (${cheese2W.toFixed(1)} g per pie, ${(c2 * 100).toFixed(0)}%)<br>
@@ -206,6 +269,10 @@
         targetWeight: document.getElementById("targetWeight").value,
         residue: document.getElementById("residue").value,
         hydration: document.getElementById("hydration").value,
+        flour1: document.getElementById("flour1").value,
+        flour1Name: document.getElementById("flour1Name").value,
+        flour2: document.getElementById("flour2").value,
+        flour2Name: document.getElementById("flour2Name").value,
         bigaFlour: document.getElementById("bigaFlour").value,
         bigaHydration: document.getElementById("bigaHydration").value,
         totalYeast: document.getElementById("totalYeast").value,
@@ -266,6 +333,10 @@
         document.getElementById("targetWeight").value = recipe.targetWeight || "340";
         document.getElementById("residue").value = recipe.residue || "4";
         document.getElementById("hydration").value = recipe.hydration || "67";
+        document.getElementById("flour1").value = recipe.flour1 || "60";
+        document.getElementById("flour1Name").value = recipe.flour1Name || "Bread Flour";
+        document.getElementById("flour2").value = recipe.flour2 || "40";
+        document.getElementById("flour2Name").value = recipe.flour2Name || "00 Flour";
         document.getElementById("bigaFlour").value = recipe.bigaFlour || "30";
         document.getElementById("bigaHydration").value = recipe.bigaHydration || "63";
         document.getElementById("totalYeast").value = recipe.totalYeast || "0.25";
