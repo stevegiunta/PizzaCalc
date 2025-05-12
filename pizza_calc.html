@@ -37,7 +37,38 @@
         }
         return gk_fileData[filename] || "";
         }
-        </script><!DOCTYPE html>
+        </script><script type="text/javascript">
+var gk_isXlsx = false;
+var gk_xlsxFileLookup = {};
+var gk_fileData = {};
+function filledCell(cell) {
+  return cell !== '' && cell != null;
+}
+function loadFileData(filename) {
+  if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+    try {
+      var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+      var firstSheetName = workbook.SheetNames[0];
+      var worksheet = workbook.Sheets[firstSheetName];
+      var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+      var filteredData = jsonData.filter(row => row.some(filledCell));
+      var headerRowIndex = filteredData.findIndex((row, index) =>
+        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+      );
+      if (headerRowIndex === -1 || headerRowIndex > 25) {
+        headerRowIndex = 0;
+      }
+      var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+      csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+      return csv;
+    } catch (e) {
+      console.error(e);
+      return "";
+    }
+  }
+  return gk_fileData[filename] || "";
+}
+</script><!DOCTYPE html>
 <html>
 <head>
   <title>NY-Style Pizza Dough Calculator</title>
@@ -122,6 +153,8 @@
   <button onclick="saveRecipe()">Save Recipe</button>
   <button onclick="updateRecipe()">Update Recipe</button>
   <button onclick="deleteRecipe()">Delete Recipe</button>
+  <button onclick="exportRecipe()">Export Recipe</button>
+  <label>Import Recipe: <input type="file" id="recipeImport" accept=".json"></label>
   <div id="result"></div>
 
   <script>
@@ -132,15 +165,21 @@
     }
 
     window.onload = function() {
-      let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
-      let select = document.getElementById('recipeSelect');
-      for (let name in recipes) {
-        let option = document.createElement('option');
-        option.value = name;
-        option.text = name;
-        select.appendChild(option);
+      try {
+        let recipes = JSON.parse(localStorage.getItem('pizzaRecipes')) || {};
+        let select = document.getElementById('recipeSelect');
+        for (let name in recipes) {
+          let option = document.createElement('option');
+          option.value = name;
+          option.text = name;
+          select.appendChild(option);
+        }
+        document.getElementById('recipeImport').addEventListener('change', handleImport);
+        calculate();
+      } catch (e) {
+        console.error('Error initializing:', e);
+        alert('Failed to load calculator.');
       }
-      calculate();
     };
 
     function calculate() {
@@ -173,7 +212,6 @@
       let sg = parseFloat(document.getElementById("sauceGarlic").value) / 100;
       let so = parseFloat(document.getElementById("sauceOregano").value) / 100;
 
-      // Validate flour percentages
       if (Math.abs(f1 + f2 - 1) > 0.01) {
         alert("Flour 1 and Flour 2 percentages must add to 100%!");
         return;
@@ -240,7 +278,7 @@
         - Olive Oil: ${oilW.toFixed(1)} g<br>
         - Diastatic Malt: ${maltW.toFixed(1)} g<br>
         - MSG: ${msgW.toFixed(1)} g<br>
-        - Total (with biga): ${preW.toFixed(1)} g    (${(preW/n).toFixed(1)} g per pie)<br><br>
+        - Total (with biga): ${preW.toFixed(1)} g (${(preW/n).toFixed(1)} g per pie)<br><br>
         <b>Cheese:</b><br>
         - ${c1Name}: ${totalCheese1W.toFixed(1)} g total (${cheese1W.toFixed(1)} g per pie, ${(c1 * 100).toFixed(0)}%)<br>
         - ${c2Name}: ${totalCheese2W.toFixed(1)} g total (${cheese2W.toFixed(1)} g per pie, ${(c2 * 100).toFixed(0)}%)<br>
@@ -383,6 +421,59 @@
         alert("Recipe '" + name + "' deleted!");
       }
     }
+
+    function exportRecipe() {
+      try {
+        const recipes = JSON.parse(localStorage.getItem('pizzaRecipes') || '{}');
+        const blob = new Blob([JSON.stringify(recipes, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'recipe.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error('Error exporting recipe:', e);
+        alert('Failed to export recipe.');
+      }
+    }
+
+    function handleImport(event) {
+      try {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const importedRecipes = JSON.parse(reader.result);
+            const existingRecipes = JSON.parse(localStorage.getItem('pizzaRecipes') || '{}');
+            // Merge recipes, updating duplicates by name
+            const mergedRecipes = { ...existingRecipes };
+            for (const name in importedRecipes) {
+              mergedRecipes[name] = importedRecipes[name];
+            }
+            localStorage.setItem('pizzaRecipes', JSON.stringify(mergedRecipes));
+            // Refresh recipe dropdown
+            const select = document.getElementById('recipeSelect');
+            select.innerHTML = '<option value="">-- Select Recipe --</option>';
+            for (const name in mergedRecipes) {
+              const option = document.createElement('option');
+              option.value = name;
+              option.text = name;
+              select.appendChild(option);
+            }
+            alert('Recipe imported successfully!');
+          } catch (e) {
+            console.error('Error parsing imported recipes:', e);
+            alert('Failed to import recipe. Invalid file format.');
+          }
+        };
+        reader.readAsText(file);
+      } catch (e) {
+        console.error('Error handling import:', e);
+        alert('Failed to import recipe.');
+      }
+    }
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93eb72531a3f804f',t:'MTc0NzA2ODk1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
