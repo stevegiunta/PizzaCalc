@@ -1,74 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><script type="text/javascript">
-var gk_isXlsx = false;
-var gk_xlsxFileLookup = {};
-var gk_fileData = {};
-function filledCell(cell) {
-  return cell !== '' && cell != null;
-}
-function loadFileData(filename) {
-  if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-    try {
-      var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-      var firstSheetName = workbook.SheetNames[0];
-      var worksheet = workbook.Sheets[firstSheetName];
-      var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-      var filteredData = jsonData.filter(row => row.some(filledCell));
-      var headerRowIndex = filteredData.findIndex((row, index) =>
-        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-      );
-      if (headerRowIndex === -1 || headerRowIndex > 25) {
-        headerRowIndex = 0;
-      }
-      var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
-      csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-      return csv;
-    } catch (e) {
-      console.error(e);
-      return "";
-    }
-  }
-  return gk_fileData[filename] || "";
-}
-</script><!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>NY-Style Pizza Dough Calculator</title>
@@ -105,6 +35,7 @@ function loadFileData(filename) {
 </head>
 <body>
   <h2>NY-Style Pizza Dough Calculator</h2>
+
   <div class="section">
     <label>Number of Pies: <input type="number" id="numPies" value="3" min="1"></label>
     <label>Target Weight per Pie (g, post-residue): <input type="number" id="targetWeight" value="340"></label>
@@ -124,6 +55,7 @@ function loadFileData(filename) {
     <label>Diastatic Malt (%): <input type="number" id="malt" value="0.5" step="0.1"></label>
     <label>MSG (%): <input type="number" id="msg" value="0.28" step="0.1"></label>
   </div>
+
   <div class="section">
     <h3>Cheese</h3>
     <label>Total Cheese (g per pie): <input type="number" id="totalCheese" value="212"></label>
@@ -134,6 +66,7 @@ function loadFileData(filename) {
     <label>Cheese 3 Name: <input type="text" id="cheese3Name" value="Parmesan"></label>
     <label>Cheese 3 (%): <input type="number" id="cheese3" value="6" step="1"></label>
   </div>
+
   <div class="section">
     <h3>Sauce</h3>
     <label>Total Sauce (g per pie): <input type="number" id="totalSauce" value="100"></label>
@@ -142,6 +75,7 @@ function loadFileData(filename) {
     <label>Garlic Powder (% of sauce): <input type="number" id="sauceGarlic" value="0.5" step="0.1"></label>
     <label>Oregano (% of sauce): <input type="number" id="sauceOregano" value="0.3" step="0.1"></label>
   </div>
+
   <div class="section">
     <label>Saved Recipes: <select id="recipeSelect" onchange="loadRecipe()">
       <option value="">-- Select Recipe --</option>
@@ -149,12 +83,14 @@ function loadFileData(filename) {
     <label>Recipe Name: <input type="text" id="recipeName" placeholder="Enter name"></label>
     <label>Notes: <textarea id="notes" placeholder="How did it turn out?"></textarea></label>
   </div>
+
   <button id="calculateBtn" onclick="calculate()">Calculate</button>
   <button onclick="saveRecipe()">Save Recipe</button>
   <button onclick="updateRecipe()">Update Recipe</button>
   <button onclick="deleteRecipe()">Delete Recipe</button>
   <button onclick="exportRecipe()">Export Recipe</button>
   <label>Import Recipe: <input type="file" id="recipeImport" accept=".json"></label>
+
   <div id="result"></div>
 
   <script>
@@ -183,6 +119,7 @@ function loadFileData(filename) {
     };
 
     function calculate() {
+      // --- inputs ---
       let n = parseFloat(document.getElementById("numPies").value);
       let w = parseFloat(document.getElementById("targetWeight").value);
       let r = parseFloat(document.getElementById("residue").value) / 100;
@@ -200,6 +137,7 @@ function loadFileData(filename) {
       let o = parseFloat(document.getElementById("oil").value) / 100;
       let m = parseFloat(document.getElementById("malt").value) / 100;
       let msg = parseFloat(document.getElementById("msg").value) / 100;
+
       let tc = parseFloat(document.getElementById("totalCheese").value);
       let c1 = parseFloat(document.getElementById("cheese1").value) / 100;
       let c2 = parseFloat(document.getElementById("cheese2").value) / 100;
@@ -207,16 +145,20 @@ function loadFileData(filename) {
       let c1Name = document.getElementById("cheese1Name").value;
       let c2Name = document.getElementById("cheese2Name").value;
       let c3Name = document.getElementById("cheese3Name").value;
-      let ts = parseFloat(document.getElementById("totalSauce").value);
+
+      // sauce inputs
+      let ts = parseFloat(document.getElementById("totalSauce").value); // g sauce per pie
       let ss = parseFloat(document.getElementById("sauceSalt").value) / 100;
       let sg = parseFloat(document.getElementById("sauceGarlic").value) / 100;
       let so = parseFloat(document.getElementById("sauceOregano").value) / 100;
 
+      // --- validation ---
       if (Math.abs(f1 + f2 - 1) > 0.01) {
         alert("Flour 1 and Flour 2 percentages must add to 100%!");
         return;
       }
 
+      // --- dough math ---
       let totalW = w * n;
       let preW = totalW / (1 - r);
       let totalP = 1 + h + s + su + o + m + y + msg;
@@ -226,48 +168,60 @@ function loadFileData(filename) {
       let flour2W = flour * f2;
       let water = flour * h;
       let yeast = flour * y;
+
       let bigaF = flour * bf;
       if (n === 1 && Math.abs(bigaF - 80) < 5) bigaF = 80;
       let bigaF1 = bigaF * f1;
       let bigaF2 = bigaF * f2;
       let bigaW = bigaF * bh;
       let bigaY = yeast * by;
+
       let finalF = flour - bigaF;
       let finalF1 = finalF * f1;
       let finalF2 = finalF * f2;
       let finalW = water - bigaW;
       let finalY = yeast - bigaY;
+
       let saltW = flour * s;
       let sugarW = flour * su;
       let oilW = flour * o;
       let maltW = flour * m;
       let msgW = flour * msg;
+
+      // --- cheese math ---
       let cheese1W = tc * c1;
       let cheese2W = tc * c2;
       let cheese3W = tc * c3;
       let totalCheese1W = cheese1W * n;
       let totalCheese2W = cheese2W * n;
       let totalCheese3W = cheese3W * n;
+
+      // --- sauce math (batch-level) ---
       let totalSauceAmt = ts * n;
-      let sauceSaltW = ts * ss;
-      let sauceGarlicW = ts * sg;
-      let sauceOreganoW = ts * so;
+      let sauceSaltWBatch    = totalSauceAmt * ss;
+      let sauceGarlicWBatch  = totalSauceAmt * sg;
+      let sauceOreganoWBatch = totalSauceAmt * so;
 
       document.getElementById("totalSauceAmount").value = totalSauceAmt.toFixed(1);
 
+      // --- output block ---
       let result = `
         <b>Total Pre-Residue (for ${n} pie${n > 1 ? 's' : ''}):</b> ${preW.toFixed(1)} g<br><br>
+
         <b>Total Flour:</b> ${flour.toFixed(1)} g<br>
         - ${f1Name}: ${flour1W.toFixed(1)} g (${(f1 * 100).toFixed(0)}%)<br>
         - ${f2Name}: ${flour2W.toFixed(1)} g (${(f2 * 100).toFixed(0)}%)<br>
+
         <b>Total Water:</b> ${water.toFixed(1)} g<br>
         <b>Total Yeast:</b> ${yeast.toFixed(2)} g<br><br>
+
         <b>Biga:</b><br>
         - ${f1Name}: ${bigaF1.toFixed(1)} g<br>
         - ${f2Name}: ${bigaF2.toFixed(1)} g<br>
         - Water: ${bigaW.toFixed(1)} g<br>
         - Yeast: ${bigaY.toFixed(2)} g<br>
         - Total: ${(bigaF + bigaW + bigaY).toFixed(1)} g<br><br>
+
         <b>Final Dough:</b><br>
         - ${f1Name}: ${finalF1.toFixed(1)} g<br>
         - ${f2Name}: ${finalF2.toFixed(1)} g<br>
@@ -279,19 +233,22 @@ function loadFileData(filename) {
         - Diastatic Malt: ${maltW.toFixed(1)} g<br>
         - MSG: ${msgW.toFixed(1)} g<br>
         - Total (with biga): ${preW.toFixed(1)} g (${(preW/n).toFixed(1)} g per pie)<br><br>
+
         <b>Cheese:</b><br>
         - ${c1Name}: ${totalCheese1W.toFixed(1)} g total (${cheese1W.toFixed(1)} g per pie, ${(c1 * 100).toFixed(0)}%)<br>
         - ${c2Name}: ${totalCheese2W.toFixed(1)} g total (${cheese2W.toFixed(1)} g per pie, ${(c2 * 100).toFixed(0)}%)<br>
         - ${c3Name}: ${totalCheese3W.toFixed(1)} g total (${cheese3W.toFixed(1)} g per pie, ${(c3 * 100).toFixed(0)}%)<br>
         - Total: ${(tc * n).toFixed(1)} g (${tc.toFixed(1)} g per pie)<br><br>
-        <b>Sauce:</b><br>
-        - Total Amount: ${totalSauceAmt.toFixed(1)} g<br>
-        - Per Pie: ${ts.toFixed(1)} g<br>
-        - Salt: ${sauceSaltW.toFixed(1)} g<br>
-        - Garlic Powder: ${sauceGarlicW.toFixed(1)} g<br>
-        - Oregano: ${sauceOreganoW.toFixed(1)} g<br><br>
+
+        <b>Sauce (batch for all ${n} pie${n > 1 ? 's' : ''}):</b><br>
+        - Total Amount: ${totalSauceAmt.toFixed(1)} g (${ts.toFixed(1)} g per pie)<br>
+        - Salt: ${sauceSaltWBatch.toFixed(2)} g<br>
+        - Garlic Powder: ${sauceGarlicWBatch.toFixed(2)} g<br>
+        - Oregano: ${sauceOreganoWBatch.toFixed(2)} g<br><br>
+
         <b>Total Post-Residue:</b> ${totalW.toFixed(1)} g
       `;
+
       document.getElementById("result").innerHTML = result;
     }
 
@@ -447,13 +404,11 @@ function loadFileData(filename) {
           try {
             const importedRecipes = JSON.parse(reader.result);
             const existingRecipes = JSON.parse(localStorage.getItem('pizzaRecipes') || '{}');
-            // Merge recipes, updating duplicates by name
             const mergedRecipes = { ...existingRecipes };
             for (const name in importedRecipes) {
               mergedRecipes[name] = importedRecipes[name];
             }
             localStorage.setItem('pizzaRecipes', JSON.stringify(mergedRecipes));
-            // Refresh recipe dropdown
             const select = document.getElementById('recipeSelect');
             select.innerHTML = '<option value="">-- Select Recipe --</option>';
             for (const name in mergedRecipes) {
@@ -475,5 +430,8 @@ function loadFileData(filename) {
       }
     }
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93eb72531a3f804f',t:'MTc0NzA2ODk1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+  <!-- keeping your original injected block untouched -->
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93eb72531a3f804f',t:'MTc0NzA2ODk1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
 </html>
